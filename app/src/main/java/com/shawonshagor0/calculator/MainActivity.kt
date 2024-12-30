@@ -2,39 +2,17 @@ package com.shawonshagor0.calculator
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.collections.mutableListOf
+import com.shawonshagor0.calculator.databinding.ActivityMainBinding
 import kotlin.math.min
 import com.udojava.evalex.Expression
+import com.udojava.evalex.Expression.ExpressionException
 
 class MainActivity : AppCompatActivity() {
-    lateinit var btnadd: Button
-    lateinit var btnsub: Button
-    lateinit var btnmul: Button
-    lateinit var btndiv: Button
-    lateinit var btn0: Button
-    lateinit var btn1: Button
-    lateinit var btn2: Button
-    lateinit var btn3: Button
-    lateinit var btn4: Button
-    lateinit var btn5: Button
-    lateinit var btn6: Button
-    lateinit var btn7: Button
-    lateinit var btn8: Button
-    lateinit var btn9: Button
-    lateinit var btnCE: Button
-    lateinit var btnBs: Button
-    lateinit var btnEql: Button
-    lateinit var tvdisp: TextView
-
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,161 +23,120 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-
-        btnadd = findViewById(R.id.btnPls)
-        btnsub = findViewById(R.id.btnMin)
-        btnmul = findViewById(R.id.btnMul)
-        btndiv = findViewById(R.id.btnDiv)
-
-        btn0 = findViewById(R.id.btn0)
-        btn1 = findViewById(R.id.btn1)
-        btn2 = findViewById(R.id.btn2)
-        btn3 = findViewById(R.id.btn3)
-        btn4 = findViewById(R.id.btn4)
-        btn5 = findViewById(R.id.btn5)
-        btn6 = findViewById(R.id.btn6)
-        btn7 = findViewById(R.id.btn7)
-        btn8 = findViewById(R.id.btn8)
-        btn9 = findViewById(R.id.btn9)
-        btnCE = findViewById(R.id.btnCE)
-        btnBs = findViewById(R.id.btnBS)
-        btnEql = findViewById(R.id.btnEql)
-        tvdisp = findViewById(R.id.tvDisp)
-
-
-
-
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         var fromEqual = false
+
         fun evaluateExpression(expression: String): String {
-            return Expression(expression).eval().toDouble().toString()
+
+            return try {
+                Expression(expression).eval().toDouble().toString()
+            } catch (e: ExpressionException) {
+                // Handle ExpressionException (e.g., invalid expression)
+                "Invalid"
+            } catch (e: NumberFormatException) {
+                // Handle NumberFormatException (e.g., invalid number format)
+                "Invalid"
+            } catch (e: Exception) {
+                // Handle other exceptions
+                "Invalid"
+            }
         }
-//        fun eval(str: String): String {
-//            var numbers = str.split("[+\\-÷×]".toRegex())
-//            val idx_signs:mutableListOf(2,4)
-//            if(str[0] == '-') numbers[0] = "-"+numbers[0]')
-//            return if(numbers.size == 1){
-//                numbers[0]
-//            }
-//
-//            else if(str.contains('+')){
-//                (numbers[0].toDouble() + numbers[1].toDouble()).toString()
-//            } else if(str.contains('-')){
-//                (numbers[0].toDouble() - numbers[1].toDouble()).toString()
-//            } else if(str.contains('×')){
-//                (numbers[0].toDouble() * numbers[1].toDouble()).toString()
-//            } else if(str.contains('÷')){
-//                (numbers[0].toDouble() / numbers[1].toDouble()).toString()
-//            }else{
-//                return "0"
-//            }
-//
-//        }
 
 
-
-        fun pressBtn(btnName:Int) {
-            Log.d("Disp",tvdisp.text.toString())
-            if(tvdisp.text == "0"){
-                tvdisp.text = btnName.toString()
-            }
-            else{
-                if(!(tvdisp.text.length > 9))tvdisp.append(btnName.toString())
-            }
-
-
-            if(tvdisp.text.length > 5){
-                tvdisp.textSize = (100f-tvdisp.text.length*5)
-                Log.d("size",tvdisp.textSize.toString())
-            }
-            else if(tvdisp.textSize < 135){
-                tvdisp.textSize = (100f+tvdisp.text.length*5)
-                Log.d("size",tvdisp.textSize.toString())
-            }
-            if(tvdisp.text != "0" && fromEqual){
-                tvdisp.text = "0"
+        fun pressBtn(btn: Int) {
+            //Append Section
+            if (fromEqual) {
+                binding.tvDisp.text = btn.toString()
                 fromEqual = false
+            } else {
+                if (btn == 0) {
+                    if (binding.tvDisp.text.toString() != "0") {
+                        binding.tvDisp.append(btn.toString())
+                    }
+                } else {
+                    if (binding.tvDisp.text.toString() == "0") {
+                        binding.tvDisp.text = btn.toString()
+                    } else {
+                        binding.tvDisp.append(btn.toString())
+                    }
+                }
             }
         }
 
-        btn0.setOnClickListener {
-            if(tvdisp.text != "0"){
-                tvdisp.append("0")
-            }
+        binding.btn0.setOnClickListener {
+            pressBtn(0)
         }
-        btn1.setOnClickListener {
+        binding.btn1.setOnClickListener {
             pressBtn(1)
         }
-        btn2.setOnClickListener {
+        binding.btn2.setOnClickListener {
             pressBtn(2)
         }
-        btn3.setOnClickListener {
+        binding.btn3.setOnClickListener {
             pressBtn(3)
         }
-        btn4.setOnClickListener {
+        binding.btn4.setOnClickListener {
             pressBtn(4)
         }
-        btn5.setOnClickListener {
+        binding.btn5.setOnClickListener {
             pressBtn(5)
         }
-        btn6.setOnClickListener {
+        binding.btn6.setOnClickListener {
             pressBtn(6)
         }
-        btn7.setOnClickListener {
+        binding.btn7.setOnClickListener {
             pressBtn(7)
         }
-        btn8.setOnClickListener {
-
+        binding.btn8.setOnClickListener {
             pressBtn(8)
         }
-        btn9.setOnClickListener {
+        binding.btn9.setOnClickListener {
             pressBtn(9)
         }
-        btnBs.setOnClickListener{
+        binding.btnBS.setOnClickListener {
 
-            if(tvdisp.text.length == 1){
-                tvdisp.text = "0"
-            }
-            else{
-                tvdisp.text=tvdisp.text.dropLast(1)
-            }
-                tvdisp.textSize = min(100f,((8-tvdisp.text.length)*2f+60f))
-                Log.d("size",tvdisp.textSize.toString())
-            if(tvdisp.textSize < 135){
+            if (binding.tvDisp.text.length == 1) {
+                binding.tvDisp.text = "0"
+            } else if (binding.tvDisp.text.toString() == "Invalid") {
+                binding.tvDisp.text = "0"
+            } else {
+                binding.tvDisp.text = binding.tvDisp.text.dropLast(1)
             }
         }
-        btnCE.setOnClickListener{
-            tvdisp.text = "0"
-            tvdisp.setTextSize(100f)
+        binding.btnCE.setOnClickListener {
+            binding.tvDisp.text = "0"
         }
 
-        btnadd.setOnClickListener{
-            tvdisp.append("+")
-            fromEqual = false
-        }
-        btnsub.setOnClickListener{
-            tvdisp.append("-")
-            fromEqual = false
-        }
-        btnmul.setOnClickListener{
-            tvdisp.append("*")
-            fromEqual = false
-        }
-        btndiv.setOnClickListener{
-            tvdisp.append("/")
+        fun signPressed(btn: String) {
+            var lastChar = binding.tvDisp.text.toString().last()
+            if ((lastChar == '+') or (lastChar == '-') or (lastChar == '*') or (lastChar == '/')) {
+                binding.tvDisp.text = binding.tvDisp.text.dropLast(1)
+            }
+            binding.tvDisp.append(btn)
             fromEqual = false
         }
 
-        btnEql.setOnClickListener{
-            tvdisp.text = evaluateExpression(tvdisp.text.toString())
-            if(tvdisp.text.takeLast(2).toString() == ".0"){//reducing .0 at last
-                tvdisp.text = tvdisp.text.dropLast(2)
-//                tvdisp.text = "P"
+        binding.btnPls.setOnClickListener {
+            signPressed("+")
+        }
+        binding.btnMin.setOnClickListener {
+            signPressed("-")
+        }
+        binding.btnMul.setOnClickListener {
+            signPressed("*")
+        }
+        binding.btnDiv.setOnClickListener {
+            signPressed("/")
+        }
+
+        binding.btnEql.setOnClickListener {
+            binding.tvDisp.text = evaluateExpression(binding.tvDisp.text.toString())
+            if (binding.tvDisp.text.takeLast(2).toString() == ".0") {//reducing .0 at last
+                binding.tvDisp.text = binding.tvDisp.text.dropLast(2)
             }
-//                tvdisp.text = tvdisp.text.takeLast(2)
             fromEqual = true
-//        Log.d(tvdisp.textSize.toString(),"M")
         }
 
         //accommodate all digits::
